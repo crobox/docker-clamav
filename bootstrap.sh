@@ -15,20 +15,20 @@ latest_exit=0
 
 # define shutdown helper
 function trapshutdown() {
-    trap "" SIGINT
-    echo "Received SIGINT stopping..."
+    trap "" SIGINT SIGTERM
+    echo "Received SIGINT/SIGTERM stopping..."
     kill $pidlist 2>/dev/null
 }
 
-function trapchild() {
+function trapchld() {
 	trap "" CHLD
 	echo "Received CHLD stopping..."
 	kill $pidlist 2>/dev/null
 }
 
 # run shutdown
-trap trapshutdown SIGINT
-trap trapchild CHLD
+trap trapshutdown SIGINT SIGTERM
+trap trapchld CHLD
 
 wait
 
