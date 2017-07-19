@@ -14,21 +14,22 @@ pidlist=`jobs -p`
 latest_exit=0
 
 # define shutdown helper
-function shutdown() {
+function trapshutdown() {
     trap "" SIGINT
-
-    for single in $pidlist; do
-        if ! kill -0 $pidlist 2>/dev/null; then
-            wait $pidlist
-            exitcode=$?
-        fi
-    done
-
+    echo "Received SIGINT stopping..."
     kill $pidlist 2>/dev/null
 }
 
+function trapchild() {
+	trap "" CHLD
+	echo "Received CHLD stopping..."
+	kill $pidlist 2>/dev/null
+}
+
 # run shutdown
-trap shutdown SIGINT
+trap trapshutdown SIGINT
+trap trapchild CHLD
+
 wait
 
 # return received result
